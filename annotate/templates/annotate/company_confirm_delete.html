@@ -1,0 +1,20 @@
+{% extends "annotate/base.html" %}
+{% block title %}
+<title>company synonym</title>
+{% endblock title  %}
+<div class="form-group">
+    <form method="post">
+        {% csrf_token %}
+        {{ object.as_p }}
+        <input type="submit" class="form-control" aria-describedby="helpId" type="submit" Value="Confirm">
+        <small id="helpId" class="form-text text-muted">Help text</small>
+    </form>
+</div>
+{% block content %}
+
+
+{% endblock content %}
+    
+   
+
+

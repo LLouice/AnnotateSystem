@@ -1,0 +1,16 @@
+{% extends "annotate/base.html" %}
+{% block title %}
+<title>company synonym</title>
+{% endblock title  %}
+
+{% block content %}
+<h2>{{ company_synonym.first.company }}的同义词:</h2>
+{% for c in company_synonym %}
+    <p>{{ c.name }}</p>
+{% endfor %}
+
+{% endblock content %}
+    
+   
+
+

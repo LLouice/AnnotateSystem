@@ -1,0 +1,141 @@
+{% extends "annotate/base.html" %} {% block content %}
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            关键词
+                        </th>
+                        <th>
+                            来源
+                        </th>
+                        <th>
+                            标注
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in company %}
+                    <tr class="{% cycle " success " "error " "warning " "info " %}">
+                        <td>
+                            {{ c.name }}
+                        </td>
+                        <td>
+                            <a class="btn btn-link" href="{% url 'news_detail' c.name %}"  role="button">{{c.news_set.count }}</a>
+
+                            <button class="btn btn-primary news"  news-ajax="{% url 'news_ajax' c.name %}">新闻</button>
+                            <a class="btn btn-link" href="{% url 'news_list' c.name %}" id="news_list" role="button">查看</a>
+
+                        </td>
+                        <td>
+                            <button class="btn btn-danger company-delete"  delete-ajax="{% url 'company_delete' c.pk %}">丢弃</button>
+                            
+                            <a href="{% url 'company_synonym' c.name %}">同义词</a>
+
+                            <a href="{% url 'company_add' c.name%}">新公司实体</a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+            
+
+            <div class="container">
+                    <div class="row clearfix">
+                        <div class="col-md-12 column">
+                             <!-- <a id="modal-610318" href="#modal-container-610318" role="button" class="btn" data-toggle="modal">触发遮罩窗体</a> -->
+                            
+                            <div class="modal fade" id="news-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                新闻
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body" id="news_modal_body">
+                                            内容...
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> <button type="button" class="btn btn-primary">确认</button>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $(".news").on('click', function (e) {
+            
+                e.preventDefault();
+                var ajax_url = $(this).attr("news-ajax");
+                console.log("the ajax_url for this:", ajax_url);
+                $.ajax({
+                    type: "GET", 
+                    url: ajax_url, 
+                    dataType: 'json', 
+                    success: function (data){ 
+                        var news = data.data;
+                        console.log(news);
+                        $("#news_modal_body").html(news);
+                        $("#news-modal").modal();
+                    },
+                    error: (data) => {
+                        console.log("error");
+
+                    } 
+            });
+        });
+
+        $(".company-delete").on('click', function(e){
+            e.preventDefault();
+            var ajax_url = $(this).attr("delete-ajax");
+            $("#news-modal").modal(
+                {
+                    
+                }
+            )
+            console.log("正在delete....");
+            $.ajax({
+                type: "POST",
+                url: ajax_url,
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    $("#news-modal").modal(
+                       {
+                           remote: ajax_url,
+                       }
+                    );
+                },
+                error: (data) => {
+                    console.log("error");
+
+                } 
+            });
+        });
+
+            
+        });
+        
+    </script>
+{% endblock js %}
