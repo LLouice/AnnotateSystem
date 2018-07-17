@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.views.generic import TemplateView
 from annotate import views
 
 # xadmin.autodiscover()
@@ -24,10 +25,29 @@ from annotate import views
 # xversion.register_models()
 
 urlpatterns = [
-    path(r'', views.index, name="home"),
+    # path(r'', views.index, name="home"),
+    path(r'', TemplateView.as_view(
+        template_name="annotate/home.html"), name="home"),
+    path(r'company_list_ajax', views.company_list_ajax, name="company_list_ajax"),
+    path(r'tech_list_ajax', views.tech_list_ajax, name="tech_list_ajax"),
+    path(r'finance_list_ajax', views.finance_list_ajax, name="finance_list_ajax"),
+    path(r'news_list_ajax', views.news_list_ajax, name="news_list_ajax"),
+    path(r'company/delete/<company>',
+         views.company_delete_ajax, name="company_delete_ajax"),
+    path(r'company_synonym_list/<company>',
+         views.company_synonym_list_ajax, name="company_synonym_list_ajax"),
+    path(r'tech_synonym_list/<tech>',
+         views.tech_synonym_list_ajax, name="tech_synonym_list_ajax"),
+    path(r'company/add/<company>',
+         views.company_add_ajax, name="company_add_ajax"),
+
+
+    # ------------------------------------------------
     path(r'index', views.index, name="index"),
-    path(r'company_add/<company>', views.CompanyUpdateView.as_view(), name="company_add"),
-    path(r'company/<pk>/delete', views.CompanyDeleteView.as_view(), name="company_delete"),
+    path(r'company_add/<company>',
+         views.CompanyUpdateView.as_view(), name="company_add"),
+    path(r'company/<pk>/delete',
+         views.CompanyDeleteView.as_view(), name="company_delete"),
     path(r'company_synonym/<company>',
          views.CompanySynonymListView.as_view(), name="company_synonym"),
     # path(r'index', views.index, name="company_delete")

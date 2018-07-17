@@ -9,7 +9,132 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
+import json
 # Create your views here.
+
+# ----------------------------- view for vue ajax request ----------------
+# def home(request):
+#     return render(request, "annotate/home.html")
+
+
+def company_list_ajax(request):
+    d = []
+    data = {}
+    companys = Company.objects.all()
+    for c in companys:
+        d.append(dict(id=c.pk, name=c.name, news_nums=c.news_set.count()))
+    data["companys"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+def tech_list_ajax(request):
+    d = []
+    data = {}
+    techs = Tech.objects.all()
+    print("techs\n", techs)
+    for t in techs:
+        d.append(dict(id=t.pk, name=t.name, news_nums=t.news_set.count(),
+                      patent_nums=t.patent_set.count()))
+    data["techs"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+def finance_list_ajax(request):
+    '''
+        新闻标题
+        来源
+        投资方
+        关系
+        融资方
+    '''
+    d = []
+    data = {}
+    finance = Finance.objects.all()
+    for f in finance:
+        news = f.news_set.all()
+        news_count = news.count()
+        news = news.first()
+        d.append(dict(id=f.pk, invest=f.company_from.name, invested=f.company_to_id, level=f.level,
+                      news_id=news.id, news_title=news.title, news_link=news.link, news_nums=news_count))
+    data["finance"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+def news_list_ajax(request):
+    company_name = request.POST.get("company")
+    company = get_object_or_404(Company, name=company)
+    news = company.news_set.all()
+    data = {}
+    data["news"] = news
+    return JsonResponse(data)
+
+
+def company_delete_ajax(request, company):
+    data = {}
+    company = get_object_or_404(Company, name=company)
+    try:
+        company.delete()
+    except Exception as e:
+        data["state"] = "error"
+    else:
+        data["state"] = "success"
+    finally:
+        return JsonResponse(data)
+
+
+def company_synonym_list_ajax(request, company):
+    d = []
+    data = {}
+    company = get_object_or_404(Company, name=company)
+    company_synonym = company.companysynonym_set.all()
+    for c in company_synonym:
+        d.append(dict(name=c.name))
+    data["company_synonym"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+def tech_synonym_list_ajax(request, tech):
+    d = []
+    data = {}
+    tech = get_object_or_404(Tech, name=tech)
+    tech_synonym = tech.techsynonym_set.all()
+    for t in tech_synonym:
+        d.append(dict(name=t.name))
+    data["tech_synonym"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+@csrf_exempt
+def company_add_ajax(request, company):
+    data = json.loads(request.body.decode('utf-8'))
+    print("company", company)
+    print("data:", data)
+    company_syn = data["company_syn"]
+    print("company_syn:", company_syn)
+    print("type:", type(company_syn))
+    try:
+        c = Company.objects.get(name=company)
+    except Exception as e0:
+        c = Company.objects.create(name=company)
+    finally:
+        try:
+            for cs in company_syn:
+                try:
+                    CompanySynonym.objects.get(name=cs, company=c)
+                except Exception as e1:
+                    CompanySynonym.objects.create(name=cs, company=c)
+            return JsonResponse({"state": "success"})
+        except Exception as e2:
+            print(e1)
+            return JsonResponse({"state": "error"})
+
+
+# -------------------------------- view for django template --------------
 
 
 def index(request):
@@ -50,11 +175,10 @@ class CompanySynonymListView(ListView):
     template_name = "annotate/company_synonym.html"
     context_object_name = "company_synonym"
 
-
     def get_queryset(self):
         queryset = super(CompanySynonymListView, self).get_queryset()
-        queryset = queryset.filter(company=self.kwargs["company"]) 
-        
+        queryset = queryset.filter(company=self.kwargs["company"])
+
         return queryset
 
 
@@ -64,21 +188,22 @@ class CompanyUpdateView(UpdateView):
     def post(self, request, *args, **kwargs):
         pass
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CompanyDeleteView(DeleteView):
     model = Company
     success_url = reverse_lazy('index')
 
-
     def get_queryset(self):
-        print("调用get_queryset");
+        print("调用get_queryset")
         # queryset = super(CompanyDeleteView, self).get_queryset()
-        queryset = Company.objects.all()# TODO
+        queryset = Company.objects.all()  # TODO
         return queryset
+
     def post(self, request, *args, **kwargs):
-        print("调用post");
+        print("调用post")
         reponse = super().post(self, request, *args, **kwargs)
-        return JsonResponse({'state':'success'})
+        return JsonResponse({'state': 'success'})
 
     def form_invalid(self, form):
         print("调用form_invalid")
@@ -102,6 +227,7 @@ class CompanyDeleteView(DeleteView):
         else:
             return response
 
+
 def news_ajax(request, company):
     company = get_object_or_404(Company, name=company)
     # # print("news", news)
@@ -111,12 +237,11 @@ def news_ajax(request, company):
     # news = {"A": "alijid", "B": "bupt"}
 
     # news = serializers.serialize("json", news)
-    ## 要显示的新闻字段 id title link
+    # 要显示的新闻字段 id title link
     news = news.values("id", "title", "link")
 
     # return HttpResponse(news)
-    return JsonResponse({"data":list(news)})
-
+    return JsonResponse({"data": list(news)})
 
 
 class NewsListView(ListView):
@@ -136,35 +261,3 @@ class NewsDetailView(DetailView):
     model = News
     template_name = "annotate/news.html"
     context_object_name = "news"
-
-    
-    
-
-    
-
-
-
-
-
-    
-    
-       
-    
-    
-    
-
-    
-    
-     
-        
-        
-       
-       
-       
-       
-                   
-     
-
-    
-
-    
