@@ -49,6 +49,8 @@ urlpatterns = [
          views.tech_synonym_list_ajax, name="tech_synonym_list_ajax"),
     path(r'company/add/<company>',
          views.company_add_ajax, name="company_add_ajax"),
+    path(r'tech/add/<tech>',
+         views.tech_add_ajax, name="tech_add_ajax"),
 
 
     # ------------------------------------------------

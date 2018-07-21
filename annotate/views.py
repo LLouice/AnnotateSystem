@@ -31,7 +31,7 @@ def company_list_ajax(request):
 def tech_list_ajax(request):
     d = []
     data = {}
-    keywords = KeywordsTech.objects.all()
+    keywords = KeywordsTech.objects.filter(is_labeled=False)
     print("keywords-tech\n", keywords)
     for k in keywords:
         d.append(dict(id=k.pk, name=k.name, news_nums=k.news.count(),
@@ -95,6 +95,7 @@ def patent_list_ajax(request, kw):
     data["patents"] = d
     print(data)
     return JsonResponse(data)
+
 
 def keywords_company_delete_ajax(request, kw):
     print("kw is:", kw)
@@ -206,6 +207,34 @@ def company_add_ajax(request, company):
             print(e2)
             return JsonResponse({"state": "error"})
 
+
+@csrf_exempt
+def tech_add_ajax(request, tech):
+    data = json.loads(request.body.decode('utf-8'))
+    print("data:", data)
+    kw = KeywordsTech.objects.get(name=data["kw"])
+    tech_syn = data["tech_syn"]
+    # 去除空值
+    # company_syn = (cs for cs in company_syn if cs)
+    try:
+        t = Tech.objects.get(name=tech)
+    except Exception as e0:
+        t = Tech.objects.create(name=tech)
+    finally:
+        print("kw:", kw)
+        kw.is_labeled = True
+        kw.save()
+        try:
+            for ts in tech_syn:  # 去除空值
+                if ts:
+                    try:
+                        TechSynonym.objects.get(name=ts, tech=t)
+                    except Exception as e1:
+                        TechSynonym.objects.create(name=ts, tech=t)
+            return JsonResponse({"state": "success"})
+        except Exception as e2:
+            print(e2)
+            return JsonResponse({"state": "error"})
 
 # -------------------------------- view for django template --------------
 

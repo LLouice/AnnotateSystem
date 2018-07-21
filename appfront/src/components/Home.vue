@@ -123,22 +123,22 @@
                   
                   
  <!-- 弹出框 -->
-                <el-popover placement="bottom" width="400" trigger="click">
+                <el-popover placement="bottom" width="400" trigger="click" @show="openPopoverTech(scope.row.name)" @hide="hidePopover">
 
                   <center>
                     <el-button type="success" size="mini"><i class="el-icon-circle-plus"></i><span type="success">{{scope.row.name}}-新标签</span></el-button>
                   </center>
                   <div class="demo-input-suffix">
-                    一级类目
-                  <el-input v-model="input_company" placeholder="一级" type="textarea" autosize></el-input>
+                    技术名称
+                  <el-input v-model="input_tech" placeholder="技术名称" type="textarea" autosize></el-input>
                   </div>
                   
                   <div class="demo-input-suffix">
                     技术同义词
-                  <el-input v-model="input_company_syn" type="textarea" placeholder="同义词 每行一条"></el-input>
+                  <el-input v-model="input_tech_syn" type="textarea" placeholder="同义词 每行一条"></el-input>
                       <center>
                     <div id="add_company_syn">
-                      <el-button type="success" @click="addTech()">添加</el-button>
+                      <el-button type="success" @click="addTech(scope.row.name)">添加</el-button>
                     </div>
                     </center>
                     </div>
@@ -306,7 +306,9 @@ export default {
       // popover
       synonymData: [{ name: "jd" }, { name: "狗东" }],
       input_company: "",
-      input_company_syn: ""
+      input_company_syn: "",
+      input_tech: "",
+      input_tech_syn: ""
     };
   },
   computed: {
@@ -503,6 +505,28 @@ export default {
       });
     },
 
+    addTech(kw) {
+      var name = this.input_tech;
+      var tech_syn = this.input_tech_syn.split("\n");
+      var ajax_url = this.root_url + "tech/add/" + name;
+      console.log("the add url:", ajax_url);
+      var data = {
+        kw: kw,
+        tech_syn: tech_syn
+      };
+      this.axios({
+        method: "POST",
+        url: ajax_url,
+        data: data
+      }).then(response => {
+        console.log("the add res", response);
+        console.log("the add res state", response.data.state);
+        this.showMsg(response.data.state, "添加");
+        //标注完成 消除显示
+      });
+    },
+
+    // ------------------------ utils ------------------------------
     axiosGet(ajax_url, msg) {
       console.log("[axiosGet]::msg:", msg);
       this.axios.get(ajax_url).then(response => {
@@ -551,10 +575,16 @@ export default {
       console.log("open over");
       this.input_company = name;
     },
+    openPopoverTech(name) {
+      console.log("open over [tech]");
+      this.input_tech = name;
+    },
     hidePopover() {
       console.log("close over");
       this.input_company = "";
       this.input_company_syn = "";
+      this.input_tech = "";
+      this.input_tech_syn = "";
     },
     handleEdit(index, row) {
       console.log(index, row);
