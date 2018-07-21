@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
-from .models import Company, CompanySynonym, News, Patent, Tech, TechSynonym, Finance
+from .models import Company, CompanySynonym, News, Patent, Tech, TechSynonym, Finance, KeywordsCompany, KeywordsTech
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -20,9 +20,9 @@ import json
 def company_list_ajax(request):
     d = []
     data = {}
-    companys = Company.objects.all()
-    for c in companys:
-        d.append(dict(id=c.pk, name=c.name, news_nums=c.news_set.count()))
+    keywords = KeywordsCompany.objects.filter(is_labeled=False)
+    for k in keywords:
+        d.append(dict(id=k.pk, name=k.name, news_nums=k.news.count()))
     data["companys"] = d
     print(data)
     return JsonResponse(data)
@@ -31,11 +31,11 @@ def company_list_ajax(request):
 def tech_list_ajax(request):
     d = []
     data = {}
-    techs = Tech.objects.all()
-    print("techs\n", techs)
-    for t in techs:
-        d.append(dict(id=t.pk, name=t.name, news_nums=t.news_set.count(),
-                      patent_nums=t.patent_set.count()))
+    keywords = KeywordsTech.objects.all()
+    print("keywords-tech\n", keywords)
+    for k in keywords:
+        d.append(dict(id=k.pk, name=k.name, news_nums=k.news.count(),
+                      patent_nums=k.patent.count()))
     data["techs"] = d
     print(data)
     return JsonResponse(data)
@@ -63,13 +63,67 @@ def finance_list_ajax(request):
     return JsonResponse(data)
 
 
-def news_list_ajax(request):
-    company_name = request.POST.get("company")
-    company = get_object_or_404(Company, name=company)
-    news = company.news_set.all()
+def news_company_list_ajax(request, kw):
+    d = []
     data = {}
-    data["news"] = news
+    news = KeywordsCompany.objects.get(name=kw).news.all()
+    for n in news:
+        d.append(dict(id=n.id, title=n.title, link=n.link, source=n.source))
+
+    data["news"] = d
+    print(data)
     return JsonResponse(data)
+
+
+def news_tech_list_ajax(request, kw):
+    d = []
+    data = {}
+    news = KeywordsTech.objects.get(name=kw).news.all()
+    for n in news:
+        d.append(dict(id=n.id, title=n.title, link=n.link, source=n.source))
+    data["news"] = d
+    print(data)
+    return JsonResponse(data)
+
+
+def patent_list_ajax(request, kw):
+    d = []
+    data = {}
+    patents = KeywordsTech.objects.get(name=kw).patent.all()
+    for p in patents:
+        d.append(dict(id=p.id, name=p.name, author=p.author, status=p.status))
+    data["patents"] = d
+    print(data)
+    return JsonResponse(data)
+
+def keywords_company_delete_ajax(request, kw):
+    print("kw is:", kw)
+    data = {}
+    data["state"] = "error"
+    kw = get_object_or_404(KeywordsCompany, name=kw)
+    try:
+        kw.delete()
+    except Exception as e:
+        print(e)
+    else:
+        data["state"] = "success"
+    finally:
+        return JsonResponse(data)
+
+
+def keywords_tech_delete_ajax(request, kw):
+    print("kw is:", kw)
+    data = {}
+    data["state"] = "error"
+    kw = get_object_or_404(KeywordsTech, name=kw)
+    try:
+        kw.delete()
+    except Exception as e:
+        print(e)
+    else:
+        data["state"] = "success"
+    finally:
+        return JsonResponse(data)
 
 
 def company_delete_ajax(request, company):
@@ -88,25 +142,37 @@ def company_delete_ajax(request, company):
 def company_synonym_list_ajax(request, company):
     d = []
     data = {}
-    company = get_object_or_404(Company, name=company)
-    company_synonym = company.companysynonym_set.all()
-    for c in company_synonym:
-        d.append(dict(name=c.name))
-    data["company_synonym"] = d
-    print(data)
-    return JsonResponse(data)
+    try:
+        company = Company.objects.get(name=company)
+    except Exception as e:
+        print(e)
+    # if use 404 not reach here
+    else:
+        print("company", company)
+        company_synonym = company.companysynonym_set.all()
+        for c in company_synonym:
+            d.append(dict(name=c.name))
+    finally:
+        data["company_synonym"] = d
+        print(data)
+        return JsonResponse(data)
 
 
 def tech_synonym_list_ajax(request, tech):
     d = []
     data = {}
-    tech = get_object_or_404(Tech, name=tech)
-    tech_synonym = tech.techsynonym_set.all()
-    for t in tech_synonym:
-        d.append(dict(name=t.name))
-    data["tech_synonym"] = d
-    print(data)
-    return JsonResponse(data)
+    try:
+        tech = Tech.objects.get(name=tech)
+    except Exception as e:
+        print(e)
+    else:
+        tech_synonym = tech.techsynonym_set.all()
+        for t in tech_synonym:
+            d.append(dict(name=t.name))
+    finally:
+        data["tech_synonym"] = d
+        print(data)
+        return JsonResponse(data)
 
 
 @csrf_exempt
@@ -114,7 +180,10 @@ def company_add_ajax(request, company):
     data = json.loads(request.body.decode('utf-8'))
     print("company", company)
     print("data:", data)
+    kw = KeywordsCompany.objects.get(name=data["kw"])
     company_syn = data["company_syn"]
+    # 去除空值
+    # company_syn = (cs for cs in company_syn if cs)
     print("company_syn:", company_syn)
     print("type:", type(company_syn))
     try:
@@ -122,15 +191,19 @@ def company_add_ajax(request, company):
     except Exception as e0:
         c = Company.objects.create(name=company)
     finally:
+        print("kw:", kw)
+        kw.is_labeled = True
+        kw.save()
         try:
-            for cs in company_syn:
-                try:
-                    CompanySynonym.objects.get(name=cs, company=c)
-                except Exception as e1:
-                    CompanySynonym.objects.create(name=cs, company=c)
+            for cs in company_syn:  # 去除空值
+                if cs:
+                    try:
+                        CompanySynonym.objects.get(name=cs, company=c)
+                    except Exception as e1:
+                        CompanySynonym.objects.create(name=cs, company=c)
             return JsonResponse({"state": "success"})
         except Exception as e2:
-            print(e1)
+            print(e2)
             return JsonResponse({"state": "error"})
 
 

@@ -28,12 +28,17 @@ class News(models.Model):
     id = models.CharField("编号", max_length=10, primary_key=True)
     title = models.CharField("标题", max_length=70, blank=True, null=True)
     link = models.URLField(verbose_name="链接", blank=True, null=True)
-    company = models.ManyToManyField(Company, verbose_name="企业")
-    tech = models.ManyToManyField("Tech", verbose_name="技术关键词")
-    finance = models.ManyToManyField("Finance", verbose_name="投融资关系")
+    company = models.ManyToManyField(Company, verbose_name="企业", blank=True)
+    tech = models.ManyToManyField("Tech", verbose_name="技术关键词", blank=True)
+    finance = models.ManyToManyField(
+        "Finance", verbose_name="投融资关系", blank=True)
+    source = models.CharField("来源", max_length=15, blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name_plural = "News"
 
 
 class Patent(models.Model):
@@ -81,6 +86,29 @@ class Finance(models.Model):
     # TODO: from != to
     # TODO: 投资类型表作为外键
 
+# 添加原生待标注的关键词表
 
-# -----------------------shell test -------------------
-# from annotate.models import Company, CompanySynonym
+
+class Keywords(models.Model):
+    name = models.CharField("关键词", max_length=50)
+    news = models.ManyToManyField("News", verbose_name="新闻", blank=True)
+    is_labeled = models.BooleanField("是否标注", default=False)
+    # patent = models.ManyToManyField("Patent", verbose_name="专利")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+
+class KeywordsCompany(Keywords):
+    pass
+
+
+class KeywordsTech(Keywords):
+    patent = models.ManyToManyField("Patent", verbose_name="专利", blank=True)
+
+    # -----------------------shell test -------------------
+    # from annotate.models import Company, CompanySynonym
+# from annotate.models import Company, CompanySynonym, News, Patent, Tech, TechSynonym, Finance, KeywordsCompany, KeywordsTech

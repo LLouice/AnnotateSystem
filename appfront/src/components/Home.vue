@@ -42,8 +42,54 @@
             </el-table-column>
             <el-table-column prop="origin" label="来源" width="280">
               <template slot-scope="scope">
-                <span>新闻<el-tag type='danger' size="mini" style="margin: 0 5px">{{scope.row.news_nums}}</el-tag></span>
-                <span>专利<el-tag type='danger' size="mini" style="margin: 0 5px">{{scope.row.patent_nums}}</el-tag></span>
+
+                       <!-- 弹出框 -->
+                <el-popover placement="right-start" width="600" trigger="click">
+                  <center>
+                    <i class="el-icon-share success"></i>
+                    <span type="success">{{scope.row.name}}-来源- {{scope.row.news_nums}} 条新闻</span>
+                  </center>
+                      <el-table :data="newsData" :highlight-current-row="true"   max-height="250">
+                          <el-table-column width="150" property="id" label="编号" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="title" label="标题" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="source" label="来源" align="center"></el-table-column>
+                          <el-table-column width="150" label="操作" align="center">
+                                      <template slot-scope="scope">
+                      
+                                  <el-button
+                                    size="mini"
+                                    type="primary"
+                                   ><a target="_blank" rel="noopener noreferrer" :href="scope.row.link" style="color:#fff;text-decoration:none">查看</a></el-button>
+                                </template>
+                          </el-table-column>
+
+          
+              </el-table>
+                <span slot="reference" @click="newsList('Tech', scope.row.name)">新闻<el-tag type='danger' size="medium" style="margin: 0 5px">{{scope.row.news_nums}}</el-tag></span>
+              </el-popover>
+
+                 <!-- 弹出框 -->
+                <el-popover placement="right-start" width="600" trigger="click">
+                  <center>
+                    <i class="el-icon-share success"></i>
+                    <span type="success">{{scope.row.name}}-来源- {{scope.row.patent_nums}} 条专利</span>
+                  </center>
+                      <el-table :data="patentData" :highlight-current-row="true"   max-height="250">
+                          <el-table-column width="150" property="id" label="编号" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="title" label="标题" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="source" label="来源" align="center"></el-table-column>
+                          <el-table-column width="150" label="操作" align="center">
+                                      <template slot-scope="scope">
+                      
+                                  <el-button
+                                    size="mini"
+                                    type="primary"
+                                   ><a target="_blank" rel="noopener noreferrer" :href="scope.row.link" style="color:#fff;text-decoration:none">查看</a></el-button>
+                                </template>
+                          </el-table-column>
+              </el-table>
+                <span slot="reference" @click="patentList(scope.row.name)">专利<el-tag type='danger' size="medium" style="margin: 0 5px">{{scope.row.patent_nums}}</el-tag></span>
+              </el-popover>
               </template>
             </el-table-column>
             <el-table-column prop="operation" label="标注">
@@ -92,7 +138,7 @@
                   <el-input v-model="input_company_syn" type="textarea" placeholder="同义词 每行一条"></el-input>
                       <center>
                     <div id="add_company_syn">
-                      <el-button type="success" @click="addCompany">添加</el-button>
+                      <el-button type="success" @click="addTech()">添加</el-button>
                     </div>
                     </center>
                     </div>
@@ -112,7 +158,31 @@
             </el-table-column>
             <el-table-column prop="origin" label="来源" width="280">
               <template slot-scope="scope">
-                <span>新闻<el-tag type='danger' size="mini" style="margin: 0 5px">{{ scope.row.news_nums}}</el-tag></span>
+                <!-- 弹出框 -->
+                <el-popover placement="right-start" width="600" trigger="click">
+                  <center>
+                    <i class="el-icon-share success"></i>
+                    <span type="success">{{scope.row.name}}-来源- {{scope.row.news_nums}} 条新闻</span>
+                  </center>
+                      <el-table :data="newsData" :highlight-current-row="true"   max-height="250">
+                          <el-table-column width="150" property="id" label="编号" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="title" label="标题" fixed align="center"></el-table-column>
+                          <el-table-column width="150" property="source" label="来源" align="center"></el-table-column>
+                          <el-table-column width="150" label="操作" align="center">
+                                      <template slot-scope="scope">
+                      
+                                  <el-button
+                                    size="mini"
+                                    type="primary"
+                                   ><a target="_blank" rel="noopener noreferrer" :href="scope.row.link" style="color:#fff;text-decoration:none">查看</a></el-button>
+                                </template>
+                          </el-table-column>
+
+               
+              </el-table>
+
+                  <span slot="reference" @click="newsList('Company', scope.row.name)">新闻<el-tag type='danger' size="medium" style="margin: 0 5px"><a>{{ scope.row.news_nums}}</a></el-tag></span>
+                </el-popover>
               </template>
             </el-table-column>
             <el-table-column prop="operation" label="标注">
@@ -120,7 +190,7 @@
                 <el-button type="info" size="mini" @click="delCompany(scope.row.name)">丢弃</el-button>
 
                 <!-- 弹出框 -->
-                <el-popover placement="bottom" width="400" trigger="click">
+                <el-popover placement="bottom" width="400" trigger="click" @show="openPopover(scope.row.name)" @hide="hidePopover">
 
           <center>
             <i class="el-icon-share success"></i>
@@ -145,7 +215,7 @@
         </el-popover>
 
         <!-- 弹出框 -->
-                <el-popover placement="bottom" width="400" trigger="click">
+                <el-popover placement="bottom" width="400" trigger="click" @show="openPopover(scope.row.name)" @hide="hidePopover">
 
                   <center>
                     <el-button type="success" size="mini"><i class="el-icon-circle-plus"></i><span type="success">新公司实体</span></el-button>
@@ -160,7 +230,7 @@
                   <el-input v-model="input_company_syn" type="textarea" placeholder="同义词 每行一条"></el-input>
                       <center>
                     <div id="add_company_syn">
-                      <el-button type="success" @click="addCompany">添加</el-button>
+                      <el-button type="success" @click="addCompany(scope.row.name)">添加</el-button>
                     </div>
                     </center>
                     </div>
@@ -224,13 +294,14 @@ export default {
       axios: require("axios"),
       msg: "hello",
       tableData: [],
+      newsData: [],
+      patentData: [],
       showTable: "TechTable",
       patent_nums: 30,
       root_url: "http://localhost:8000/",
       company_list_url: "http://localhost:8000/" + "company_list_ajax",
       tech_list_url: "http://localhost:8000/" + "tech_list_ajax",
       finance_list_url: "http://localhost:8000/" + "finance_list_ajax",
-      news_list_url: "http://localhost:8000/news_list_ajax",
 
       // popover
       synonymData: [{ name: "jd" }, { name: "狗东" }],
@@ -278,9 +349,27 @@ export default {
       });
     },
 
-    news_list() {
+    newsList(type, kw) {
       // ajax request
-      return;
+      console.log("news display....", kw);
+      if (type === "Company") {
+        var ajax_url = this.root_url + "news_company_list_ajax/" + kw;
+      }
+      if (type === "Tech") {
+        var ajax_url = this.root_url + "news_tech_list_ajax/" + kw;
+      }
+      this.axios.get(ajax_url).then(response => {
+        console.log(response.data.news);
+        this.newsData = response.data.news;
+      });
+    },
+
+    patentList(kw) {
+      var ajax_url = this.root_url + "patent_list_ajax/" + kw;
+      this.axios.get(ajax_url).then(response => {
+        console.log(response.data.patents);
+        this.patentData = response.data.patents;
+      });
     },
     getCompany() {
       console.log("here is getCompany");
@@ -332,22 +421,61 @@ export default {
     // --------- delete------------------
     delCompany(name) {
       console.log("in delCompany", name);
-      var ajax_url = this.root_url + "company/delete/" + name;
-      this.$alert("确认删除?", "技术关键词: " + name, {
+      var ajax_url = this.root_url + "keywords_company/delete/" + name;
+      this.$confirm("确认删除?", "企业关键词: " + name, {
         confirmButtonText: "确定",
-        callback: action => {
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
           this.axiosGet(ajax_url, name);
-        }
-      });
+          this.$message({
+            type: "success",
+            message: "删除成功"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+      //   callback: action => {
+      //     this.axiosGet(ajax_url, name);
+      //   }
+      // });
+    },
+    delTech(name) {
+      console.log("in delTech", name);
+      var ajax_url = this.root_url + "keywords_tech/delete/" + name;
+      this.$confirm("确认删除?", "技术关键词: " + name, {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.axiosGet(ajax_url, name);
+          this.$message({
+            type: "success",
+            message: "删除成功"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
 
     //  ---------------------  add ----------------------------
-    addCompany() {
+    addCompany(kw) {
       var name = this.input_company;
       var company_syn = this.input_company_syn.split("\n");
       var ajax_url = this.root_url + "company/add/" + name;
       console.log("the add url:", ajax_url);
       var data = {
+        kw: kw,
         company_syn: company_syn
       };
       this.axios({
@@ -371,6 +499,7 @@ export default {
         console.log("the add res", response);
         console.log("the add res state", response.data.state);
         this.showMsg(response.data.state, "添加");
+        //标注完成 消除显示
       });
     },
 
@@ -418,7 +547,15 @@ export default {
         this.getCompany();
       }
     },
-
+    openPopover(name) {
+      console.log("open over");
+      this.input_company = name;
+    },
+    hidePopover() {
+      console.log("close over");
+      this.input_company = "";
+      this.input_company_syn = "";
+    },
     handleEdit(index, row) {
       console.log(index, row);
     },
@@ -444,6 +581,9 @@ export default {
 .el-textarea {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.el-tag {
+  cursor: pointer;
 }
 
 #add_company_syn {
