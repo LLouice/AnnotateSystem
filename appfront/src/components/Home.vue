@@ -94,7 +94,7 @@
             </el-table-column>
             <el-table-column prop="operation" label="标注">
               <template slot-scope="scope">
-                <el-button type="info" size="mini" @click="open">丢弃</el-button>
+                <el-button type="info" size="mini" @click="delTech(scope.row.name)">丢弃</el-button>
 
     <!-- 弹出框 -->
                 <el-popover placement="bottom" width="400" trigger="click">
@@ -424,13 +424,14 @@ export default {
     delCompany(name) {
       console.log("in delCompany", name);
       var ajax_url = this.root_url + "keywords_company/delete/" + name;
+      var who = "Company";
       this.$confirm("确认删除?", "企业关键词: " + name, {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          this.axiosGet(ajax_url, name);
+          this.axiosGet(ajax_url, name, who);
           this.$message({
             type: "success",
             message: "删除成功"
@@ -450,13 +451,14 @@ export default {
     delTech(name) {
       console.log("in delTech", name);
       var ajax_url = this.root_url + "keywords_tech/delete/" + name;
+      var who = "Tech";
       this.$confirm("确认删除?", "技术关键词: " + name, {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          this.axiosGet(ajax_url, name);
+          this.axiosGet(ajax_url, name, who);
           this.$message({
             type: "success",
             message: "删除成功"
@@ -527,14 +529,14 @@ export default {
     },
 
     // ------------------------ utils ------------------------------
-    axiosGet(ajax_url, msg) {
+    axiosGet(ajax_url, msg, who) {
       console.log("[axiosGet]::msg:", msg);
       this.axios.get(ajax_url).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         var state = response.data.state;
         console.log("get the res!");
-        this.cb(state, msg);
+        this.cb(state, msg, who);
       });
     },
 
@@ -562,13 +564,18 @@ export default {
       }
     },
 
-    cb(state, msg) {
+    cb(state, msg, who) {
       console.log("in cb msg:", msg);
       console.log("in cb state:", state);
       this.showMsg(state, "删除" + "[" + msg + "]");
       console.log("state:", state);
       if (state === "success") {
-        this.getCompany();
+        if (who === "Tech") {
+          this.getTech();
+        }
+        if (who === "Company") {
+          this.getCompany();
+        }
       }
     },
     openPopover(name) {
