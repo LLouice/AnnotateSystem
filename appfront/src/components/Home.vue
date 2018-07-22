@@ -291,17 +291,16 @@ export default {
       keyword: "图像识别"
     };
     return {
-      axios: require("axios"),
       msg: "hello",
       tableData: [],
       newsData: [],
       patentData: [],
       showTable: "TechTable",
       patent_nums: 30,
-      root_url: "http://localhost:8000/",
-      company_list_url: "http://localhost:8000/" + "company_list_ajax",
-      tech_list_url: "http://localhost:8000/" + "tech_list_ajax",
-      finance_list_url: "http://localhost:8000/" + "finance_list_ajax",
+      root_url: this.$axios.defaults.baseURL,
+      company_list_url: "/company_list_ajax",
+      tech_list_url: "/tech_list_ajax",
+      finance_list_url: "/finance_list_ajax",
 
       // popover
       synonymData: [{ name: "jd" }, { name: "狗东" }],
@@ -321,7 +320,7 @@ export default {
   },
   mounted() {
     this.getTech();
-    // this.axios.defaults.xsrfHeaderName = "X-CSRFToken";
+    // this.$axios.defaults.xsrfHeaderName = "X-CSRFToken";
   },
   methods: {
     setShowTable(showTable) {
@@ -339,36 +338,26 @@ export default {
         this.getFinance();
       }
     },
-    open() {
-      this.$alert("这是一段内容", "标题名称", {
-        confirmButtonText: "确定",
-        callback: action => {
-          this.$message({
-            type: "info",
-            message: `action: ${action}`
-          });
-        }
-      });
-    },
+    
 
     newsList(type, kw) {
       // ajax request
       console.log("news display....", kw);
       if (type === "Company") {
-        var ajax_url = this.root_url + "news_company_list_ajax/" + kw;
+        var ajax_url =  "/news_company_list_ajax/" + kw;
       }
       if (type === "Tech") {
-        var ajax_url = this.root_url + "news_tech_list_ajax/" + kw;
+        var ajax_url =  "/news_tech_list_ajax/" + kw;
       }
-      this.axios.get(ajax_url).then(response => {
+      this.$axios.get(ajax_url).then(response => {
         console.log(response.data.news);
         this.newsData = response.data.news;
       });
     },
 
     patentList(kw) {
-      var ajax_url = this.root_url + "patent_list_ajax/" + kw;
-      this.axios.get(ajax_url).then(response => {
+      var ajax_url = "/patent_list_ajax/" + kw;
+      this.$axios.get(ajax_url).then(response => {
         console.log(response.data.patents);
         this.patentData = response.data.patents;
       });
@@ -376,7 +365,7 @@ export default {
     getCompany() {
       console.log("here is getCompany");
 
-      this.axios.get(this.company_list_url).then(response => {
+      this.$axios.get(this.company_list_url).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         var companys = response.data.companys;
@@ -387,7 +376,7 @@ export default {
 
     getTech() {
       console.log("in getTech");
-      this.axios.get(this.tech_list_url).then(response => {
+      this.$axios.get(this.tech_list_url).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         var techs = response.data.techs;
@@ -397,7 +386,7 @@ export default {
     },
     getFinance() {
       console.log("in getFinance");
-      this.axios.get(this.finance_list_url).then(response => {
+      this.$axios.get(this.finance_list_url).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         var finance = response.data.finance;
@@ -408,14 +397,14 @@ export default {
 
     getCompanySyn(company) {
       console.log("in getcs");
-      var ajax_url = this.root_url + "company_synonym_list/" + company;
-      this.axios.get(ajax_url).then(response => {
+      var ajax_url = "/company_synonym_list/" + company;
+      this.$axios.get(ajax_url).then(response => {
         this.synonymData = response.data.company_synonym;
       });
     },
     getTechSyn(tech) {
-      var ajax_url = this.root_url + "tech_synonym_list/" + tech;
-      this.axios.get(ajax_url).then(response => {
+      var ajax_url = "/tech_synonym_list/" + tech;
+      this.$axios.get(ajax_url).then(response => {
         this.synonymData = response.data.tech_synonym;
         this.showPoper = true;
       });
@@ -423,7 +412,7 @@ export default {
     // --------- delete------------------
     delCompany(name) {
       console.log("in delCompany", name);
-      var ajax_url = this.root_url + "keywords_company/delete/" + name;
+      var ajax_url = "/keywords_company/delete/" + name;
       var who = "Company";
       this.$confirm("确认删除?", "企业关键词: " + name, {
         confirmButtonText: "确定",
@@ -450,7 +439,7 @@ export default {
     },
     delTech(name) {
       console.log("in delTech", name);
-      var ajax_url = this.root_url + "keywords_tech/delete/" + name;
+      var ajax_url = "/keywords_tech/delete/" + name;
       var who = "Tech";
       this.$confirm("确认删除?", "技术关键词: " + name, {
         confirmButtonText: "确定",
@@ -476,13 +465,13 @@ export default {
     addCompany(kw) {
       var name = this.input_company;
       var company_syn = this.input_company_syn.split("\n");
-      var ajax_url = this.root_url + "company/add/" + name;
+      var ajax_url = "/company/add/" + name;
       console.log("the add url:", ajax_url);
       var data = {
         kw: kw,
         company_syn: company_syn
       };
-      this.axios({
+      this.$axios({
         method: "POST",
         url: ajax_url,
         data: data
@@ -510,13 +499,13 @@ export default {
     addTech(kw) {
       var name = this.input_tech;
       var tech_syn = this.input_tech_syn.split("\n");
-      var ajax_url = this.root_url + "tech/add/" + name;
+      var ajax_url =  "/tech/add/" + name;
       console.log("the add url:", ajax_url);
       var data = {
         kw: kw,
         tech_syn: tech_syn
       };
-      this.axios({
+      this.$axios({
         method: "POST",
         url: ajax_url,
         data: data
@@ -531,7 +520,7 @@ export default {
     // ------------------------ utils ------------------------------
     axiosGet(ajax_url, msg, who) {
       console.log("[axiosGet]::msg:", msg);
-      this.axios.get(ajax_url).then(response => {
+      this.$axios.get(ajax_url).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         var state = response.data.state;
@@ -541,7 +530,7 @@ export default {
     },
 
     axiosPost(ajax_url, data) {
-      this.axios.post(ajax_url, data).then(response => {
+      this.$axios.post(ajax_url, data).then(response => {
         console.log("in axios ajax");
         console.log("raw res", response);
         console.log("get the res!");
@@ -575,6 +564,9 @@ export default {
         }
         if (who === "Company") {
           this.getCompany();
+        }
+        if (who === "Tech") {
+          this.getTech();
         }
       }
     },

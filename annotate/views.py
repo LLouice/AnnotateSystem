@@ -176,7 +176,7 @@ def tech_synonym_list_ajax(request, tech):
         return JsonResponse(data)
 
 
-@csrf_exempt
+# @csrf_exempt
 def company_add_ajax(request, company):
     data = json.loads(request.body.decode('utf-8'))
     print("company", company)
@@ -208,7 +208,7 @@ def company_add_ajax(request, company):
             return JsonResponse({"state": "error"})
 
 
-@csrf_exempt
+# @csrf_exempt
 def tech_add_ajax(request, tech):
     data = json.loads(request.body.decode('utf-8'))
     print("data:", data)
