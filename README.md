@@ -44,7 +44,7 @@ WEBPACK_LOADER = {
   TEMPLATES
   'DIRS': [os.path.join(BASE_DIR, 'annotate/templates')],
 - prod
-  'DIRS': ['appfront/index.html'],
+  'DIRS': ['appfront/dist'],
    # 同时更改 urls.py 路由
 ```
 
