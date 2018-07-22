@@ -197,8 +197,8 @@
             <span type="success">同义词</span>
           </center>
           <el-table :data="synonymData" :highlight-current-row="true">
-            <el-table-column width="150" property="name" label="同义词"></el-table-column>
-            <el-table-column label="操作">
+            <el-table-column width="150" property="name" label="同义词" align="center"></el-table-column>
+            <el-table-column label="操作" align="center">
               <template slot-scope="scope">
                         <el-button
                           size="mini"
@@ -243,22 +243,22 @@
 
         <template v-else-if="showTable === 'RelationTable'">
           <el-table :data="tableData" key="RelationTable">
-            <el-table-column prop="keyword" label="新闻来源" width="140">
+            <el-table-column prop="keyword" label="新闻来源" width="140" align="center">
               <template slot-scope="scope">
                <span>{{ scope.row.news_id }} 等<el-tag type='danger' size="mini" style="margin: 0 5px">{{scope.row.news_nums}}</el-tag></span>
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="新闻标题" >
+            <el-table-column prop="title" label="新闻标题" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.news_title}}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="invest" label="投资方" >
+            <el-table-column prop="invest" label="投资方" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.invest}}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="investR" label="投资关系" >
+            <el-table-column prop="investR" label="投资关系" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.level }}</span>
               </template>
@@ -268,7 +268,7 @@
                 <span>{{ scope.row.invested}}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="operation" label="标注">
+            <el-table-column prop="operation" label="标注" align="center">
               <template slot-scope="scope">
                 <el-button type="primary" size="mini" >确认</el-button>
                 <el-button type="warning" size="mini">修正</el-button>
