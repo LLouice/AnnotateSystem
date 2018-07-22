@@ -87,4 +87,5 @@ typings/
 # My
 # Packaged
 *.sqlite3
+webpack-stats.json
 

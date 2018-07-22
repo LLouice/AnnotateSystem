@@ -493,6 +493,7 @@ export default {
         console.log("the add res state", response.data.state);
         this.showMsg(response.data.state, "添加");
         //标注完成 消除显示
+        this.getCompany();
       });
     },
 
@@ -514,6 +515,7 @@ export default {
         console.log("the add res state", response.data.state);
         this.showMsg(response.data.state, "添加");
         //标注完成 消除显示
+        this.getTech();
       });
     },
 
