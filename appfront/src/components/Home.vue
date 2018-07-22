@@ -35,12 +35,12 @@
 
         <template v-if="showTable === 'TechTable'">
           <el-table :data="tableData" key="TechTable">
-            <el-table-column prop="keyword" label="关键词" width="140">
+            <el-table-column prop="keyword" label="关键词" width="140" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="来源" width="280">
+            <el-table-column prop="origin" label="来源" width="280" align="center">
               <template slot-scope="scope">
 
                        <!-- 弹出框 -->
@@ -92,7 +92,7 @@
               </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="operation" label="标注">
+            <el-table-column prop="operation" label="标注" align="center">
               <template slot-scope="scope">
                 <el-button type="info" size="mini" @click="delTech(scope.row.name)">丢弃</el-button>
 
@@ -151,12 +151,12 @@
 
         <template v-else-if="showTable === 'CompanyTable'">
           <el-table  :data="tableData" key="CompanyTable">
-            <el-table-column prop="name" label="关键词" width="140">
+            <el-table-column prop="name" label="关键词" width="140" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="来源" width="280">
+            <el-table-column prop="origin" label="来源" width="280" align="center">
               <template slot-scope="scope">
                 <!-- 弹出框 -->
                 <el-popover placement="right-start" width="600" trigger="click">
@@ -185,7 +185,7 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="operation" label="标注">
+            <el-table-column prop="operation" label="标注" align="center">
               <template slot-scope="scope">
                 <el-button type="info" size="mini" @click="delCompany(scope.row.name)">丢弃</el-button>
 
