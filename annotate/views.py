@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
+from django.db.models.functions import Lower
 import json
 # Create your views here.
 
@@ -18,9 +19,17 @@ import json
 
 
 def company_list_ajax(request):
+    data = json.loads(request.body.decode('utf-8'))
+    is_all = True if data["is_all"] == "2" else False
+    print("is_all:", is_all)
     d = []
     data = {}
-    keywords = KeywordsCompany.objects.filter(is_labeled=False)
+    if is_all:
+        keywords = KeywordsCompany.objects.order_by(
+            "is_labeled", Lower("name"))
+    else:
+        keywords = KeywordsCompany.objects.filter(is_labeled=False)
+
     for k in keywords:
         d.append(dict(id=k.pk, name=k.name, news_nums=k.news.count()))
     data["companys"] = d
@@ -29,9 +38,14 @@ def company_list_ajax(request):
 
 
 def tech_list_ajax(request):
+    data = json.loads(request.body.decode('utf-8'))
+    is_all = True if data["is_all"] == "2" else False
     d = []
     data = {}
-    keywords = KeywordsTech.objects.filter(is_labeled=False)
+    if is_all:
+        keywords = KeywordsTech.objects.order_by("is_labeled", Lower("name"))
+    else:
+        keywords = KeywordsTech.objects.filter(is_labeled=False)
     print("keywords-tech\n", keywords)
     for k in keywords:
         d.append(dict(id=k.pk, name=k.name, news_nums=k.news.count(),
