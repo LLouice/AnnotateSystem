@@ -11,6 +11,7 @@ import axios from "axios"
 
 let host = window.location.host.split(":")[0];
 axios.defaults.baseURL = `http://${host}:9006`;
+// CSRF
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
