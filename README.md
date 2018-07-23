@@ -86,6 +86,6 @@ dev: {
 ```js
 import axios from "axios";
 let host = window.location.host.split(":")[0];
-axios.defaults.baseURL = `http://${host}:9080`;
+axios.defaults.baseURL = `http://${host}:9006`;
 Vue.prototype.$axios = axios;
 ```
