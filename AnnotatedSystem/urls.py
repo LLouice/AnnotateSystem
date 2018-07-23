@@ -26,10 +26,10 @@ from annotate import views
 
 urlpatterns = [
     # path(r'', views.index, name="home"),
-    path(r'', TemplateView.as_view(
-        template_name="annotate/home.html"), name="home"),
     # path(r'', TemplateView.as_view(
-    #   template_name="index.html")),  # prod
+    # template_name="annotate/home.html"), name="home") # dev,
+    path(r'', TemplateView.as_view(
+        template_name="index.html")),  # prod
     path(r'company_list_ajax', views.company_list_ajax, name="company_list_ajax"),
     path(r'tech_list_ajax', views.tech_list_ajax, name="tech_list_ajax"),
     path(r'finance_list_ajax', views.finance_list_ajax, name="finance_list_ajax"),

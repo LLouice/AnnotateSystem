@@ -25,7 +25,7 @@ SECRET_KEY = '*y+etn!79on4ew@w*3s5qye_$18ng-)5gid!b^#2qm%4j-08(s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["10.108.211.136", ]
 
 
 # Application definition
@@ -71,8 +71,8 @@ ROOT_URLCONF = 'AnnotatedSystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'annotate/templates')],
-        #'DIRS': ['appfront/dist'],  # prod
+        # 'DIRS': [os.path.join(BASE_DIR, 'annotate/templates')], # dev
+        'DIRS': ['appfront/dist'],  # prod
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
